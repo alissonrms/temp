@@ -1,0 +1,98 @@
+<p-dialog
+  [(visible)]="dialogState.isOpen"
+  [style]="{ width: '450px', marginLeft: '1rem', marginRight: '1rem' }"
+  header="Definir Intervalo"
+  [modal]="true"
+  class="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <form [formGroup]="temperatureIntervalForm" autocomplete="off">
+      <fieldset class="p-fluid p-formgrid grid">
+        <div class="field col-12">
+          <label htmlFor="stock"> Tempo Inicial </label>
+          <p-calendar
+            formControlName="initialTime"
+            [required]="true"
+            [timeOnly]="true"
+            [inline]="true"
+            [ngClass]="{
+              'ng-invalid ng-dirty': !isFieldValid('initialTime')
+            }"
+          ></p-calendar>
+          <small
+            id="stock-help"
+            class="p-error block"
+            *ngIf="!isFieldValid('initialTime')"
+          >
+            Valor obrigatório.
+          </small>
+        </div>
+        <div class="field col-12">
+          <label htmlFor="stock"> Tempo Final </label>
+          <p-calendar
+            formControlName="finalTime"
+            [required]="true"
+            [timeOnly]="true"
+            [inline]="true"
+            [ngClass]="{
+              'ng-invalid ng-dirty': !isFieldValid('finalTime')
+            }"
+          ></p-calendar>
+          <small
+            id="stock-help"
+            class="p-error block"
+            *ngIf="!isFieldValid('finalTime')"
+          >
+            Valor obrigatório.
+          </small>
+        </div>
+        <div class="field col-12">
+          <label htmlFor="restockThreshold"> Temperatura </label>
+          <p-inputNumber
+            id="restockThreshold"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            spinnerMode="horizontal"
+            [step]="1"
+            decrementButtonClass="p-button-danger"
+            incrementButtonClass="p-button-success"
+            [min]="-100"
+            incrementButtonIcon="pi pi-plus"
+            decrementButtonIcon="pi pi-minus"
+            formControlName="temperature"
+            [ngClass]="{
+              'ng-invalid ng-dirty': !isFieldValid('restockThreshold')
+            }"
+          ></p-inputNumber>
+          <small
+            id="restockThreshold-help"
+            class="p-error block"
+            *ngIf="!isFieldValid('restockThreshold')"
+          >
+            Valor obrigatório.
+          </small>
+        </div>
+      </fieldset>
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancelar"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="closeDialog()"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Salvar"
+      icon="pi pi-check"
+      class="p-button-text"
+      [disabled]="temperatureIntervalForm.invalid"
+      (click)="submitForm()"
+    ></button>
+  </ng-template>
+</p-dialog>

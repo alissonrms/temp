@@ -1,0 +1,19 @@
+<div class="flex flex-column md:flex-row align-items-center p-3 w-full">
+  <div class="my-4 md:my-0 w-full md:w-20rem mr-5">
+    <app-temperature-history-chart></app-temperature-history-chart>
+  </div>
+  <div
+    class="flex-1 flex flex-column align-items-center text-center md:text-left"
+  >
+    <div class="font-bold text-2xl">{{ device?.name }}</div>
+  </div>
+  <div
+    class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0"
+  >
+    <span
+      class="text-2xl font-semibold mb-2 align-self-center md:align-self-end"
+    >
+      {{ device?.actualTemperature }}°C
+    </span>
+  </div>
+</div>
