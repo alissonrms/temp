@@ -1,12 +1,15 @@
-<div class="grid">
+<div class="grid" *ngIf="!isLoading">
   <div class="col-12 lg:col-6 xl:col-4">
     <div class="card mb-0">
       <div class="flex justify-content-between mb-3">
         <div>
-          <span class="block text-500 font-medium mb-3"
-            >Nome do Dispositivo</span
-          >
-          <div class="text-900 font-medium text-xl">Frigobar Sala</div>
+          <span class="block text-500 font-medium mb-3">
+            Nome do Dispositivo
+          </span>
+          <app-device-name-form
+            [device]="device"
+            (updateDeviceName)="handleUpdateDeviceName($event)"
+          ></app-device-name-form>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-blue-100 border-round"
@@ -22,7 +25,13 @@
       <div class="flex justify-content-between mb-3">
         <div>
           <span class="block text-500 font-medium mb-3">Temperatura Atual</span>
-          <div class="text-900 font-medium text-xl">-2°C</div>
+          <span class="text-900 font-medium text-xl" [pTooltip]="
+          'Atualizado ' +
+          (device?.actualTemperatureInfos?.updatedAt
+            | dfnsFormatDistanceToNow : dateDisplayOptions)
+        ">
+            {{ device?.actualTemperatureInfos?.temperature }}°C
+          </span>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-blue-100 border-round"
@@ -41,10 +50,12 @@
     <div class="card mb-0">
       <div class="flex justify-content-between mb-3">
         <div>
-          <span class="block text-500 font-medium mb-3"
-            >Temperatura Atual Desejada</span
-          >
-          <div class="text-900 font-medium text-xl">0°C</div>
+          <span class="block text-500 font-medium mb-3">
+            Temperatura Atual Desejada
+          </span>
+          <div class="text-900 font-medium text-xl">
+            {{ goalTemperature }}°C
+          </div>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-blue-100 border-round"
@@ -64,6 +75,7 @@
       <h5>Programação do Dispositivo</h5>
       <app-temperature-history-chart
         [hideHistoryLine]="true"
+        [device]="device"
       ></app-temperature-history-chart>
       <button
         pButton
@@ -79,7 +91,9 @@
   <div class="col-12 xl:col-6">
     <div class="card">
       <h5>Histórico de Temperatura</h5>
-      <app-temperature-history-chart></app-temperature-history-chart>
+      <app-temperature-history-chart
+        [device]="device"
+      ></app-temperature-history-chart>
     </div>
   </div>
 
@@ -87,3 +101,5 @@
     [dialogState]="temperatureModalForm"
   ></app-temperature-interval-form>
 </div>
+
+<app-dashboard-loading-page *ngIf="isLoading"></app-dashboard-loading-page>

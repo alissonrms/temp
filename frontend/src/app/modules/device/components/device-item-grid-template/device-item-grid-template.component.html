@@ -9,17 +9,26 @@
   </div>
   <div class="flex flex-column align-items-center gap-4 text-center mb-3">
     <div class="w-full">
-      <app-temperature-history-chart></app-temperature-history-chart>
+      <app-temperature-history-chart
+        [device]="device"
+      ></app-temperature-history-chart>
     </div>
-    <div class="text-xl font-bold">{{ device?.name }}</div>
-    <div class="flex items-center justify-center gap-2">
+    <app-device-name-form [device]="device" (updateDeviceName)="updateDeviceName.emit($event)"></app-device-name-form>
+    <div
+      class="flex items-center justify-center gap-2 mx-2"
+      [pTooltip]="
+        'Atualizado ' +
+        (device?.actualTemperatureInfos?.updatedAt
+          | dfnsFormatDistanceToNow : dateDisplayOptions)
+      "
+    >
       <img src="assets/layout/images/logo.png" alt="Logo" height="25" />
       <span class="text-xl font-semibold">
-        {{ device?.actualTemperature }}°C
+        {{ device?.actualTemperatureInfos?.temperature }}°C
       </span>
     </div>
     <a
-      [routerLink]="device?.id"
+      [routerLink]="device?.macAddress"
       pButton
       label="Configurar"
       icon="pi pi-cog"

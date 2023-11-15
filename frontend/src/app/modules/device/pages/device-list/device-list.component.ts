@@ -1,43 +1,108 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { Device } from '../../shared/device.model';
 import { DataView } from 'primeng/dataview';
+import { AuthService } from 'src/app/services/auth.service';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-device-list',
   templateUrl: './device-list.component.html',
   styleUrls: ['./device-list.component.scss'],
 })
-export class DeviceListComponent {
-  devices: Device[] = [
-    {
-      id: 'asdasldkjf123',
-      name: 'Freezer Área de Churrasco',
-      actualTemperature: 0,
-      temperatureConfig: [],
-      temperatureHistory: [],
-    },
-    {
-      id: 'asdasldkjf1223',
-      name: 'Freezer Cozinha',
-      actualTemperature: 2,
-      temperatureConfig: [],
-      temperatureHistory: [],
-    },
-    {
-      id: 'asdasldkj4f1223',
-      name: 'Frigobar Sala',
-      actualTemperature: -4,
-      temperatureConfig: [],
-      temperatureHistory: [],
-    },
-  ];
+export class DeviceListComponent implements OnInit {
+  devices: Device[] = [];
 
   sortOrder: number = 0;
-
   sortField: string = '';
+  isLoading = false;
 
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private firestore: AngularFirestore,
+    private utilsService: UtilsService
+  ) {
+    this.fetchUserDevices();
+  }
+
+  ngOnInit(): void {}
+
+  async fetchUserDevices() {
+    this.isLoading = true;
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.firestore
+          .collection('users')
+          .doc(user?.uid)
+          .get()
+          .subscribe(async (userDataSnapshot: any) => {
+            this.devices = [];
+            for (const deviceRef of userDataSnapshot.data().devices) {
+              const deviceSnapshot = await deviceRef.get();
+              if (deviceSnapshot.exists) {
+                const deviceData = deviceSnapshot.data() as Device;
+                this.registerDevice(deviceData);
+              }
+            }
+            this.isLoading = false;
+          });
+      },
+    });
+  }
+
+  registerDevice(device: Device): void {
+    device.temperatureConfig.forEach((config) => {
+      config.initialTime =
+        this.utilsService.convertTimestampToActualTimestampDate(
+          config.initialTime
+        );
+      config.finalTime =
+        this.utilsService.convertTimestampToActualTimestampDate(
+          config.finalTime
+        );
+    });
+    this.devices.push(device);
+    this.listenToDeviceChanges(device.macAddress);
+  }
+
+  listenToDeviceChanges(macAddress: string): void {
+    this.firestore
+      .collection('devices')
+      .doc(macAddress)
+      .snapshotChanges()
+      .subscribe((snapshot) => {
+        if (snapshot.payload.exists) {
+          const deviceData = snapshot.payload.data() as Device;
+          this.devices[
+            this.findDeviceIndexByMacAddress(macAddress)
+          ].actualTemperatureInfos = deviceData.actualTemperatureInfos;
+        } else {
+          console.log('Documento do dispositivo não encontrado.');
+        }
+      });
+  }
+
+  findDeviceIndexByMacAddress(macAddress: string): number {
+    return this.devices.findIndex((device) => device.macAddress === macAddress);
+  }
+
+  async handleUpdateDeviceName(
+    device: Device & { editMode: boolean }
+  ): Promise<void> {
+    if (device.name.length > 3) {
+      await this.firestore
+        .collection('devices')
+        .doc(device.macAddress)
+        .update({ name: device.name });
+      return;
+    }
+
+    this.utilsService.showInfoMessage(
+      'O nome do dispositivo deve ter pelo menos 3 caracteres'
+    );
+    device.editMode = true;
+  }
 
   onSortChange(event: any) {
     const value = event.value;

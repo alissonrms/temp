@@ -1,0 +1,19 @@
+<div class="card">
+  <h5>Cadastrar Novo Dispositivo</h5>
+  <p-steps
+    [model]="formSteps"
+    [readonly]="true"
+    [activeIndex]="activeStep"
+    styleClass="my-5"
+  ></p-steps>
+  <app-serial-input-step
+    *ngIf="activeStep === 0"
+    (codeCompleted)="handleCodeCompleted($event)"
+    [isLoading]="isLoading"
+  ></app-serial-input-step>
+  <app-device-info-step
+    *ngIf="activeStep === 1"
+    [infoForm]="infoForm"
+    (formSubmited)="handleRegisterNewDevice()"
+  ></app-device-info-step>
+</div>

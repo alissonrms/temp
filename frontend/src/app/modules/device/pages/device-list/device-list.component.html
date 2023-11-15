@@ -1,47 +1,43 @@
-<div class="grid">
-  <div class="col-12">
-    <div class="card">
-      <h5>Seus Dispositivos</h5>
-      <p-dataView
-        #dataView
-        [value]="devices"
-        [paginator]="true"
-        [rows]="9"
-        filterBy="name"
-        [sortField]="sortField"
-        [sortOrder]="sortOrder"
-        layout="grid"
+<div class="card">
+  <h5>Seus Dispositivos</h5>
+  <p-dataView
+    #dataView
+    [value]="devices"
+    [loading]="isLoading"
+    [rows]="9"
+    filterBy="name"
+    [sortField]="sortField"
+    [sortOrder]="sortOrder"
+    layout="grid"
+  >
+    <ng-template pTemplate="header">
+      <div
+        class="flex flex-column md:flex-row md:justify-content-between gap-2"
       >
-        <ng-template pTemplate="header">
-          <div
-            class="flex flex-column md:flex-row md:justify-content-between gap-2"
-          >
-            <span class="p-input-icon-left">
-              <i class="pi pi-search"></i>
-              <input
-                type="search"
-                pInputText
-                placeholder="Procurar pelo Nome"
-                (input)="onFilter(dataView, $event)"
-              />
-            </span>
-          </div>
-        </ng-template>
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            type="search"
+            pInputText
+            placeholder="Procurar pelo Nome"
+            (input)="onFilter(dataView, $event)"
+          />
+        </span>
+      </div>
+    </ng-template>
 
-        <ng-template let-device pTemplate="listItem">
-          <div class="col-12">
-            <app-device-item-list-template [device]="device">
-            </app-device-item-list-template>
-          </div>
-        </ng-template>
+    <ng-template let-device pTemplate="listItem">
+      <div class="col-12">
+        <app-device-item-list-template [device]="device">
+        </app-device-item-list-template>
+      </div>
+    </ng-template>
 
-        <ng-template let-device pTemplate="gridItem">
-          <div class="col-12 md:col-6">
-            <app-device-item-grid-template [device]="device">
-            </app-device-item-grid-template>
-          </div>
-        </ng-template>
-      </p-dataView>
-    </div>
-  </div>
+    <ng-template let-device pTemplate="gridItem">
+      <div class="col-12 md:col-6">
+        <app-device-item-grid-template [device]="device" (updateDeviceName)="handleUpdateDeviceName($event)">
+        </app-device-item-grid-template>
+      </div>
+    </ng-template>
+  </p-dataView>
 </div>

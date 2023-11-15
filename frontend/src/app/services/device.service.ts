@@ -10,6 +10,6 @@ export class DeviceService {
   constructor(private database: AngularFireDatabase) { }
 
   addDeviceForUser(userId: string, device: Device) {
-    return this.database.list(`/devices/${userId}`).push(device);
+    return this.database.list(`/users/${userId}/devices`).push(device);
   }
 }

@@ -1,0 +1,25 @@
+<form [formGroup]="infoForm" (ngSubmit)="handleSubmit()" class="flex flex-column gap-3 justify-content-center align-items-center">
+  <label for="name" class="text-center block text-900 text-lg font-medium">
+    Dê um nome para seu novo dispositivo
+  </label>
+  <input
+    id="name"
+    type="text"
+    placeholder="Nome do Dispositivo"
+    pInputText
+    class="w-full max-w-30rem"
+    style="padding: 1rem"
+    formControlName="name"
+    autofocus
+  />
+  <span for="email" class="text-center block text-500 text-sm font-medium">
+    Escolha algo intuitivo, como "Freezer da área de churrasco", por exemplo
+  </span>
+  <button
+    pButton
+    pRipple
+    [disabled]="infoForm.invalid || infoForm.disabled"
+    label="Cadastrar"
+    class="w-full p-3 text-xl mt-2 max-w-30rem"
+  ></button>
+</form>

@@ -1,0 +1,14 @@
+<fieldset [disabled]="isLoading">
+  <span
+    class="text-center block text-900 text-lg font-medium mb-5"
+  >
+    Digite o Código serial do seu novo dispositivo
+  </span>
+  <code-input (codeCompleted)="onCodeCompleted($event)"></code-input>
+  <span
+    for="email"
+    class="text-center block text-500 text-sm font-medium mt-4"
+  >
+    O código deve ser digitado sem os hífens " - "
+  </span>
+</fieldset>

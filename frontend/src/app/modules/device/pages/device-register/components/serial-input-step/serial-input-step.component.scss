@@ -1,0 +1,25 @@
+code-input {
+  ::ng-deep {
+    .ng-star-inserted:nth-child(odd) {
+      --item-shadow-focused: none;
+      padding: 0 !important;
+
+      input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: none;
+        text-align: end;
+      }
+    }
+
+    .ng-star-inserted:nth-child(even) {
+      --item-shadow-focused: none;
+      input {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: none;
+        text-align: start;
+      }
+    }
+  }
+}

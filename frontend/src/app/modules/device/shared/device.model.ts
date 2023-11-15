@@ -1,18 +1,22 @@
 export interface TemperatureInterval {
-  initialTime: Date;
-  finalTime: Date;
+  initialTime: number;
+  finalTime: number;
   temperature: number;
 }
 
 export interface TemperatureHistoryItem {
   temperature: number;
-  time: Date;
+  time: number;
 }
 
 export interface Device {
-  id: string;
+  macAddress: string;
   name: string;
-  actualTemperature: number;
+  actualTemperatureInfos: {
+    temperature: number;
+    updatedAt: number;
+  };
   temperatureConfig: TemperatureInterval[];
   temperatureHistory: TemperatureHistoryItem[];
+  userId?: string;
 }

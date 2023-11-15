@@ -11,15 +11,26 @@ import { PickListModule } from 'primeng/picklist';
 import { OrderListModule } from 'primeng/orderlist';
 import { RatingModule } from 'primeng/rating';
 import { DialogModule } from 'primeng/dialog';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
 import { ChartModule } from 'primeng/chart';
+import { StepsModule } from 'primeng/steps';
+import { InputMaskModule } from 'primeng/inputmask';
 import { DeviceItemGridTemplateComponent } from './components/device-item-grid-template/device-item-grid-template.component';
 import { DeviceItemListTemplateComponent } from './components/device-item-list-template/device-item-list-template.component';
 import { TemperatureHistoryChartComponent } from './components/temperature-history-chart/temperature-history-chart.component';
+import { DeviceRegisterComponent } from './pages/device-register/device-register.component';
+import { SerialInputStepComponent } from './pages/device-register/components/serial-input-step/serial-input-step.component';
+import { DeviceInfoStepComponent } from './pages/device-register/components/device-info-step/device-info-step.component';
+import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
+import { CodeInputModule } from 'angular-code-input';
+import { DateFnsModule } from 'ngx-date-fns';
+import { DeviceNameFormComponent } from './components/device-name-form/device-name-form.component';
+import { DashboardLoadingPageComponent } from './pages/device-dashboard/components/dashboard-loading-page/dashboard-loading-page.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +40,11 @@ import { TemperatureHistoryChartComponent } from './components/temperature-histo
     DeviceItemGridTemplateComponent,
     DeviceItemListTemplateComponent,
     TemperatureHistoryChartComponent,
+    DeviceRegisterComponent,
+    SerialInputStepComponent,
+    DeviceInfoStepComponent,
+    DeviceNameFormComponent,
+    DashboardLoadingPageComponent,
   ],
   imports: [
     CommonModule,
@@ -44,7 +60,19 @@ import { TemperatureHistoryChartComponent } from './components/temperature-histo
     DialogModule,
     ButtonModule,
     CalendarModule,
-    ChartModule
+    ChartModule,
+    StepsModule,
+    InputMaskModule,
+    FormsModule,
+    TooltipModule,
+    SkeletonModule,
+    CodeInputModule.forRoot({
+      codeLength: 12,
+      isCharsCode: true,
+      isFocusingOnLastByClickIfFilled: true,
+      initialFocusField: 0
+    }),
+    DateFnsModule.forRoot()
   ],
 })
 export class DeviceModule {}

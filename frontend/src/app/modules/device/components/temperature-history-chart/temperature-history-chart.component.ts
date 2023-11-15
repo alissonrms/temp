@@ -9,49 +9,13 @@ import 'chartjs-adapter-date-fns';
   styleUrls: ['./temperature-history-chart.component.scss'],
 })
 export class TemperatureHistoryChartComponent implements OnInit {
-  device: Device;
+  @Input() device?: Device;
   @Input() hideHistoryLine: boolean = false;
 
   data: any;
   options: any;
 
-  constructor() {
-    this.device = {
-      id: 'asdasldkjf1223',
-      name: 'Device 1',
-      actualTemperature: 25,
-      temperatureConfig: [
-        {
-          initialTime: new Date('2023-06-28T00:00:00'),
-          finalTime: new Date('2023-06-28T05:00:00'),
-          temperature: 40,
-        },
-        {
-          initialTime: new Date('2023-06-28T05:00:00'),
-          finalTime: new Date('2023-06-28T10:00:00'),
-          temperature: 10,
-        },
-        {
-          initialTime: new Date('2023-06-28T10:00:00'),
-          finalTime: new Date('2023-06-28T15:30:00'),
-          temperature: 0,
-        },
-        {
-          initialTime: new Date('2023-06-28T15:30:00'),
-          finalTime: new Date('2023-06-28T24:00:00'),
-          temperature: 0,
-        },
-      ],
-      temperatureHistory: [
-        { temperature: 39, time: new Date('2023-06-28T00:00:00') },
-        { temperature: 12, time: new Date('2023-06-28T06:00:00') },
-        { temperature: 9, time: new Date('2023-06-28T09:00:00') },
-        { temperature: -4, time: new Date('2023-06-28T10:00:00') },
-        { temperature: -6, time: new Date('2023-06-28T11:30:00') },
-        { temperature: 2, time: new Date('2023-06-28T12:00:00') },
-      ],
-    };
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.createChart();
@@ -136,9 +100,9 @@ export class TemperatureHistoryChartComponent implements OnInit {
     });
   }
 
-  createTemperatureHistoryData(): Array<{ x: Date; y: number }> {
+  createTemperatureHistoryData(): Array<{ x: number; y: number }> | undefined {
     if (this.hideHistoryLine) return [];
-    return this.device.temperatureHistory.map((temperatureHistoryItem) => {
+    return this.device?.temperatureHistory.map((temperatureHistoryItem) => {
       return {
         x: temperatureHistoryItem.time,
         y: temperatureHistoryItem.temperature,
@@ -147,10 +111,10 @@ export class TemperatureHistoryChartComponent implements OnInit {
   }
 
   createConfigTemperatureBasedOnHistoryTemperature(): Array<{
-    x: Date;
+    x: number;
     y: number;
   }> {
-    const datesBasedOnHistoryTemps = this.createTemperatureHistoryData().map(
+    const datesBasedOnHistoryTemps = this.createTemperatureHistoryData()?.map(
       (register) => {
         return {
           x: register.x,
@@ -159,7 +123,7 @@ export class TemperatureHistoryChartComponent implements OnInit {
       }
     );
 
-    const datesBasedOnIntervals = this.device.temperatureConfig.map(
+    const datesBasedOnIntervals = this.device?.temperatureConfig.map(
       (interval) => {
         return {
           x: interval.initialTime,
@@ -168,18 +132,18 @@ export class TemperatureHistoryChartComponent implements OnInit {
       }
     );
 
-    datesBasedOnIntervals.push({
-      x: this.device.temperatureConfig[this.device.temperatureConfig.length - 1]
-        .finalTime,
-      y: this.device.temperatureConfig[this.device.temperatureConfig.length - 1]
-        .temperature,
+    datesBasedOnIntervals?.push({
+      x: this.device?.temperatureConfig[this.device?.temperatureConfig.length - 1]
+        .finalTime ?? 0,
+      y: this.device?.temperatureConfig[this.device?.temperatureConfig.length - 1]
+        .temperature ?? 0,
     });
 
-    return [...datesBasedOnIntervals];
+    return datesBasedOnIntervals ? [...datesBasedOnIntervals] : [];
   }
 
-  getExpectedTemperatureInTime(time: Date): number {
-    const interval = this.device.temperatureConfig.find(
+  getExpectedTemperatureInTime(time: number): number {
+    const interval = this.device?.temperatureConfig.find(
       (interval) => time >= interval.initialTime && time <= interval.finalTime
     );
     return interval?.temperature || 0;
