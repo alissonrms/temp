@@ -21,15 +21,15 @@ export class AppMenuComponent implements OnInit {
             icon: 'pi pi-fw pi-server',
             routerLink: ['/', 'app'],
           },
-          {
-            label: 'Configuração Múltipla',
-            icon: 'pi pi-fw pi-database',
-            routerLink: ['/'],
-          },
+          // {
+          //   label: 'Configuração Múltipla',
+          //   icon: 'pi pi-fw pi-database',
+          //   routerLink: ['/', 'app'],
+          // },
           {
             label: 'Novo Dispositivo',
             icon: 'pi pi-fw pi-cart-plus',
-            routerLink: ['/'],
+            routerLink: ['/', 'app', 'novo'],
           },
         ],
       },
