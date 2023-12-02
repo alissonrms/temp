@@ -99,7 +99,10 @@
 
   <app-temperature-interval-form
     [dialogState]="temperatureModalForm"
+    (formSubmitted)="handleNewInterval($event)"
   ></app-temperature-interval-form>
 </div>
+
+{{ device?.temperatureConfig | json }}
 
 <app-dashboard-loading-page *ngIf="isLoading"></app-dashboard-loading-page>

@@ -126,17 +126,21 @@ export class TemperatureHistoryChartComponent implements OnInit {
     const datesBasedOnIntervals = this.device?.temperatureConfig.map(
       (interval) => {
         return {
-          x: interval.initialTime,
+          x: interval.timeToStop,
           y: interval.temperature,
         };
       }
     );
 
     datesBasedOnIntervals?.push({
-      x: this.device?.temperatureConfig[this.device?.temperatureConfig.length - 1]
-        .finalTime ?? 0,
-      y: this.device?.temperatureConfig[this.device?.temperatureConfig.length - 1]
-        .temperature ?? 0,
+      x:
+        this.device?.temperatureConfig[
+          this.device?.temperatureConfig.length - 1
+        ].timeToStop ?? 0,
+      y:
+        this.device?.temperatureConfig[
+          this.device?.temperatureConfig.length - 1
+        ].temperature ?? 0,
     });
 
     return datesBasedOnIntervals ? [...datesBasedOnIntervals] : [];
@@ -144,7 +148,7 @@ export class TemperatureHistoryChartComponent implements OnInit {
 
   getExpectedTemperatureInTime(time: number): number {
     const interval = this.device?.temperatureConfig.find(
-      (interval) => time >= interval.initialTime && time <= interval.finalTime
+      (interval) => time >= interval.timeToStop
     );
     return interval?.temperature || 0;
   }

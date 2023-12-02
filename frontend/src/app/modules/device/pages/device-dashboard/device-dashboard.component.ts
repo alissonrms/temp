@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Device } from '../../shared/device.model';
+import { Device, addIntervalToDeviceConfig } from '../../shared/device.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilsService } from 'src/app/services/utils.service';
 import { dateDisplayOptions } from 'src/app/utils/utils';
@@ -42,16 +42,6 @@ export class DeviceDashboardComponent implements OnInit {
         if (snapshot.payload.exists) {
           const deviceData = snapshot.payload.data() as Device;
           this.device = { ...deviceData, editMode: false };
-          this.device.temperatureConfig.forEach((config) => {
-            config.initialTime =
-              this.utilsService.convertTimestampToActualTimestampDate(
-                config.initialTime
-              );
-            config.finalTime =
-              this.utilsService.convertTimestampToActualTimestampDate(
-                config.finalTime
-              );
-          });
           this.isLoading = false;
         } else {
           this.router.navigate(['/', 'app']);
@@ -82,10 +72,7 @@ export class DeviceDashboardComponent implements OnInit {
     const currentTimestamp = Date.now();
     const temperatureConfig = this.device?.temperatureConfig;
     for (const interval of temperatureConfig) {
-      if (
-        currentTimestamp >= interval.initialTime &&
-        currentTimestamp <= interval.finalTime
-      ) {
+      if (currentTimestamp > interval.timeToStop) {
         return interval.temperature;
       }
     }
@@ -95,5 +82,18 @@ export class DeviceDashboardComponent implements OnInit {
 
   openDialog(): void {
     this.temperatureModalForm.isOpen = true;
+  }
+
+  handleNewInterval(temperatureIntervalConfig: {
+    initialTime: number;
+    finalTime: number;
+    temperature: number;
+  }): void {
+    addIntervalToDeviceConfig(
+      this.device!,
+      temperatureIntervalConfig.initialTime,
+      temperatureIntervalConfig.finalTime,
+      temperatureIntervalConfig.temperature
+    );
   }
 }

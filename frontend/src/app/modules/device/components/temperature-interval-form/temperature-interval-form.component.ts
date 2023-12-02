@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UtilsService } from 'src/app/services/utils.service';
+import { convertDateToDailyMinutesTimestamp } from 'src/app/utils/utils';
 
 interface DialogState {
   isOpen: boolean;
@@ -14,12 +15,19 @@ interface DialogState {
 })
 export class TemperatureIntervalFormComponent {
   @Input() dialogState: DialogState = { isOpen: false };
+  @Output() formSubmitted = new EventEmitter<{
+    initialTime: number;
+    finalTime: number;
+    temperature: number;
+  }>();
   temperatureIntervalForm: FormGroup;
 
   constructor(private utilsService: UtilsService) {
+    const initialTime = new Date();
+    initialTime.setHours(0, 0, 0);
     this.temperatureIntervalForm = new FormGroup({
-      initialTime: new FormControl(null, [Validators.required]),
-      finalTime: new FormControl(null, [Validators.required]),
+      initialTime: new FormControl(initialTime, [Validators.required]),
+      finalTime: new FormControl(initialTime, [Validators.required]),
       temperature: new FormControl(0, [Validators.required]),
     });
   }
@@ -36,5 +44,11 @@ export class TemperatureIntervalFormComponent {
     this.temperatureIntervalForm.reset();
   }
 
-  submitForm(): void {}
+  submitForm(): void {
+    this.formSubmitted.emit({
+      initialTime: convertDateToDailyMinutesTimestamp(this.temperatureIntervalForm.get('initialTime')?.value),
+      finalTime: convertDateToDailyMinutesTimestamp(this.temperatureIntervalForm.get('finalTime')?.value),
+      temperature: this.temperatureIntervalForm.get('temperature')?.value,
+    });
+  }
 }

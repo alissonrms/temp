@@ -138,14 +138,11 @@ export class DeviceRegisterComponent {
 
   getTemperatureInitialConfig(): TemperatureInterval {
     const initialHourInitialConfig = new Date();
-    const finalHourInitialConfig = new Date();
 
-    initialHourInitialConfig.setHours(0, 0);
-    finalHourInitialConfig.setHours(23, 59);
+    initialHourInitialConfig.setHours(0, 0, 0);
 
     return {
-      initialTime: initialHourInitialConfig.getTime(),
-      finalTime: finalHourInitialConfig.getTime(),
+      timeToStop: initialHourInitialConfig.getTime(),
       temperature: 0,
     };
   }

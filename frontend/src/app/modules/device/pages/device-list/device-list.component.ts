@@ -5,6 +5,7 @@ import { DataView } from 'primeng/dataview';
 import { AuthService } from 'src/app/services/auth.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { UtilsService } from 'src/app/services/utils.service';
+import { forkJoin, from, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-device-list',
@@ -30,36 +31,42 @@ export class DeviceListComponent implements OnInit {
 
   async fetchUserDevices() {
     this.isLoading = true;
-    this.authService.getUser().subscribe({
-      next: (user) => {
-        this.firestore
-          .collection('users')
-          .doc(user?.uid)
-          .get()
-          .subscribe(async (userDataSnapshot: any) => {
+  
+    this.authService.getUser().pipe(
+      switchMap((user) => {
+        if (!user) {
+          // handle the case where user is null
+          return [];
+        }
+  
+        return this.firestore.collection('users').doc(user.uid).get().pipe(
+          switchMap((userDataSnapshot: any) => {
             this.devices = [];
-            for (const deviceRef of userDataSnapshot.data().devices) {
-              const deviceSnapshot = await deviceRef.get();
-              if (deviceSnapshot.exists) {
-                const deviceData = deviceSnapshot.data() as Device;
-                this.registerDevice(deviceData);
-              }
-            }
-            this.isLoading = false;
-          });
-      },
+  
+            const deviceObservables = userDataSnapshot.data().devices.map((deviceRef: any) => {
+              return from(deviceRef.get());
+            });
+  
+            return forkJoin(deviceObservables);
+          })
+        );
+      })
+    ).subscribe((deviceSnapshots) => {
+      for (const deviceSnapshot of deviceSnapshots as any[]) {
+        if (deviceSnapshot.exists) {
+          const deviceData = deviceSnapshot.data() as Device;
+          this.registerDevice(deviceData);
+        }
+      }
+      this.isLoading = false;
     });
   }
 
   registerDevice(device: Device): void {
     device.temperatureConfig.forEach((config) => {
-      config.initialTime =
+      config.timeToStop =
         this.utilsService.convertTimestampToActualTimestampDate(
-          config.initialTime
-        );
-      config.finalTime =
-        this.utilsService.convertTimestampToActualTimestampDate(
-          config.finalTime
+          config.timeToStop
         );
     });
     this.devices.push(device);
