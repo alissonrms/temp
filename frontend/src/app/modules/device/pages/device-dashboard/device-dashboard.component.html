@@ -29,7 +29,8 @@
             class="text-900 font-medium text-xl"
             [pTooltip]="
               'Atualizado ' +
-              (actualTemperatureTime | dfnsFormatDistanceToNow : dateDisplayOptions)
+              (actualTemperatureTime
+                | dfnsFormatDistanceToNow : dateDisplayOptions)
             "
           >
             {{ actualTemperature }}°C
@@ -79,7 +80,13 @@
         [temperatureConfig]="device?.temperatureConfig || []"
         (intervalClicked)="handleOpenIntervalOptions($event)"
       ></app-temperature-config-chart>
-      <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
+      <p-menu
+        #menu
+        [hidden]="currentIntervalIndex === -1"
+        [model]="menuItems"
+        styleClass="w-full mt-2"
+        (onBlur)="currentIntervalIndex = -1"
+      ></p-menu>
       <p-confirmDialog></p-confirmDialog>
       <button
         pButton

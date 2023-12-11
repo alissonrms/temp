@@ -18,13 +18,12 @@
       class="flex items-center justify-center gap-2 mx-2"
       [pTooltip]="
         'Atualizado ' +
-        (device?.actualTemperatureInfos?.updatedAt
-          | dfnsFormatDistanceToNow : dateDisplayOptions)
+        (actualTemperatureTime | dfnsFormatDistanceToNow : dateDisplayOptions)
       "
     >
       <img src="assets/layout/images/logo.png" alt="Logo" height="25" />
       <span class="text-xl font-semibold">
-        {{ device?.actualTemperatureInfos?.temperature }}°C
+        {{ actualTemperature }}°C
       </span>
     </div>
     <a

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import {
   Device,
@@ -7,7 +7,10 @@ import {
 } from '../../shared/device.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilsService } from 'src/app/services/utils.service';
-import { dateDisplayOptions } from 'src/app/utils/utils';
+import {
+  convertDailyMinutesTimestampToFormattedDate,
+  dateDisplayOptions,
+} from 'src/app/utils/utils';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 
@@ -29,28 +32,59 @@ export class DeviceDashboardComponent implements OnInit {
   dateDisplayOptions = dateDisplayOptions;
 
   menuItems: MenuItem[] = [];
-  currentIntervalIndex = 0;
+  currentIntervalIndex = -1;
 
   constructor(
     private firestore: AngularFirestore,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private utilsService: UtilsService,
-    private confirmationService: ConfirmationService
-  ) {}
+    private confirmationService: ConfirmationService,
+    private renderer: Renderer2
+  ) {
+    this.renderer.listen('window', 'click', (e: Event) => {
+      if (!this.menu.containerViewChild.nativeElement.contains(e.target)) {
+        this.currentIntervalIndex = -1;
+      }
+    });
+  }
 
   ngOnInit(): void {
     const deviceMac = this.activatedRoute.snapshot.params['deviceMacAddress'];
     this.fetchAndListenToDeviceChanges(deviceMac);
+    this.updateMenu();
+  }
+
+  updateMenu(): void {
     this.menuItems = [
       {
-        label: 'Remover',
+        label: `Remover Intervalo ${this.getCurrentIntervalLabel()}`,
         icon: 'pi pi-fw pi-trash',
         command: () => {
           this.handleDeleteInterval();
         },
       },
     ];
+  }
+
+  private getCurrentIntervalLabel(): string {
+    if(this.currentIntervalIndex === -1) return '';
+    
+    const prevInterval =
+      this.currentIntervalIndex > 0
+        ? this.device?.temperatureConfig[this.currentIntervalIndex - 1]
+        : this.device?.temperatureConfig[
+            this.device?.temperatureConfig.length - 1
+          ];
+
+    return `${convertDailyMinutesTimestampToFormattedDate(
+      prevInterval!.timeToStop === 1440 ? 0 : prevInterval!.timeToStop
+    )} - ${convertDailyMinutesTimestampToFormattedDate(
+      this.device?.temperatureConfig[this.currentIntervalIndex].timeToStop ||
+        1440
+    )}\n${
+      this.device?.temperatureConfig[this.currentIntervalIndex].temperature
+    }°C`;
   }
 
   fetchAndListenToDeviceChanges(macAddress: string): void {
@@ -134,8 +168,9 @@ export class DeviceDashboardComponent implements OnInit {
   }
 
   handleOpenIntervalOptions(event: any): void {
-    this.menu.show(event.originalEvent);
+    event.originalEvent.stopPropagation();
     this.currentIntervalIndex = event.element.index;
+    this.updateMenu();
   }
 
   handleDeleteInterval(): void {
@@ -154,6 +189,7 @@ export class DeviceDashboardComponent implements OnInit {
       rejectLabel: 'Cancelar',
       accept: () => {
         removeIntervalFromDeviceConfig(this.device!, this.currentIntervalIndex);
+        this.device!.temperatureConfig = [...this.device!.temperatureConfig];
         this.saveDeviceTemperatureConfig();
       },
     });

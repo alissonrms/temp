@@ -36,7 +36,6 @@ export class TemperatureConfigChartComponent {
       aspectRatio: 1,
       rotation,
       cutoutPercentage: 0,
-      responsive: true,
       events: ['mousemove'],
       plugins: {
         tooltip: {

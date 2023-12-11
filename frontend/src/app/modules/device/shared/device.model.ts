@@ -111,6 +111,10 @@ function mergeSameTemperatureIntervals(device: Device): void {
     mergedIntervals.pop();
   }
 
+  if (mergedIntervals.length < 2) {
+    mergedIntervals[0].timeToStop = 1440;
+  }
+
   device.temperatureConfig = mergedIntervals;
 }
 
