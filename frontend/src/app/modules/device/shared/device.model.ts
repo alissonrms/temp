@@ -26,96 +26,45 @@ export function addIntervalToDeviceConfig(
   timeToStop: number,
   temperature: number
 ): void {
-  if (timeToStart === 0) {
-    timeToStart = 1440;
+  if (timeToStart === 0) timeToStart = 1440;
+  if (timeToStop === 0) timeToStop = 1440;
+
+  const timeToStartInterval = findIntervalByTime(device, timeToStart);
+  const timeToStopInterval = findIntervalByTime(device, timeToStop);
+
+  let startIntervalAfterChanges = timeToStartInterval;
+  let stopIntervalAfterChanges = timeToStopInterval;
+
+  if (timeToStartInterval.timeToStop !== timeToStart) {
+    const newStartIntervalToAdd: TemperatureInterval = {
+      temperature: timeToStartInterval.temperature,
+      timeToStop: timeToStart,
+    };
+    device.temperatureConfig.push(newStartIntervalToAdd);
+    sortIntervals(device);
+
+    startIntervalAfterChanges = newStartIntervalToAdd;
   }
 
-  if (timeToStop === 0) {
-    timeToStop = 1440;
+  if (timeToStopInterval.timeToStop === timeToStop) {
+    const index = device.temperatureConfig.indexOf(timeToStopInterval);
+    device.temperatureConfig[index].temperature = temperature;
+  } else {
+    const newStopIntervalToAdd: TemperatureInterval = {
+      temperature: temperature,
+      timeToStop: timeToStop,
+    };
+    device.temperatureConfig.push(newStopIntervalToAdd);
+    sortIntervals(device);
+    stopIntervalAfterChanges = newStopIntervalToAdd;
   }
-
-  prepareToReceiveNewInterval(device, timeToStart, timeToStop);
-  device.temperatureConfig.push({ timeToStop, temperature });
-  sortIntervals(device);
-  mergeSameTemperatureIntervals(device);
-}
-
-function prepareToReceiveNewInterval(
-  device: Device,
-  timeToStart: number,
-  timeToStop: number
-): void {
-  function handleUpdateStartInterval(): void {
-    const startIndex = device.temperatureConfig.indexOf(
-      initialOverwriteInterval
-    );
-
-    if (startIndex === -1) return;
-
-    const indexBefore =
-      startIndex > 0 ? startIndex - 1 : device.temperatureConfig.length - 1;
-
-    const prevIntervalTimeToStop =
-      device.temperatureConfig[indexBefore].timeToStop === 1440
-        ? 0
-        : device.temperatureConfig[indexBefore].timeToStop;
-
-    if (prevIntervalTimeToStop === timeToStart) {
-      if (
-        startIndex !== findIntervalIndexByTime(device, timeToStop) ||
-        timeToStop === prevIntervalTimeToStop
-      ) {
-        device.temperatureConfig.splice(startIndex, 1);
-        return;
-      }
-
-      return;
-    }
-
-    if (
-      findIntervalIndexByTime(device, timeToStop) === startIndex &&
-      device.temperatureConfig[startIndex].timeToStop !== timeToStop &&
-      device.temperatureConfig.length > 1
-    ) {
-      const newStartTimeInterval = {
-        temperature: initialOverwriteInterval.temperature,
-        timeToStop: timeToStart,
-      };
-
-      device.temperatureConfig.push(newStartTimeInterval);
-      sortIntervals(device);
-      return;
-    }
-
-    device.temperatureConfig[startIndex].timeToStop = timeToStart;
-  }
-
-  function handleUpdateFinalInterval(): void {
-    const stopIndex = device.temperatureConfig.indexOf(finalOverwriteInterval);
-
-    if (stopIndex === -1) return;
-
-    if (device.temperatureConfig[stopIndex].timeToStop === timeToStop) {
-      device.temperatureConfig.splice(stopIndex, 1);
-    }
-  }
-
-  if(timeToStart === timeToStop) {
-    device.temperatureConfig = [];
-    return;
-  }
-
-  const initialOverwriteInterval = findIntervalByTime(device, timeToStart);
-  const finalOverwriteInterval = findIntervalByTime(device, timeToStop);
 
   removeIntervalsBetween(
     device,
-    device.temperatureConfig.indexOf(initialOverwriteInterval),
-    device.temperatureConfig.indexOf(finalOverwriteInterval)
+    device.temperatureConfig.indexOf(startIntervalAfterChanges),
+    device.temperatureConfig.indexOf(stopIntervalAfterChanges)
   );
-
-  handleUpdateStartInterval();
-  handleUpdateFinalInterval();
+  mergeSameTemperatureIntervals(device);
 }
 
 function removeIntervalsBetween(
@@ -130,9 +79,9 @@ function removeIntervalsBetween(
   function handleInitialHigher() {
     device.temperatureConfig.splice(
       indexStart + 1,
-      device.temperatureConfig.length - 1
+      device.temperatureConfig.length - 1 - indexStart
     );
-    device.temperatureConfig.splice(0, indexStop - 1);
+    device.temperatureConfig.splice(0, indexStop);
   }
 
   indexStart <= indexStop ? handleFinalHigher() : handleInitialHigher();
@@ -143,7 +92,7 @@ function mergeSameTemperatureIntervals(device: Device): void {
   if (temperatureConfig.length < 2) {
     device.temperatureConfig[0].timeToStop = 1440;
     return;
-  };
+  }
 
   const mergedIntervals: TemperatureInterval[] = [temperatureConfig[0]];
 
@@ -162,7 +111,7 @@ function mergeSameTemperatureIntervals(device: Device): void {
     mergedIntervals.pop();
   }
 
-  device.temperatureConfig = mergedIntervals;  
+  device.temperatureConfig = mergedIntervals;
 }
 
 export function removeIntervalFromDeviceConfig(
@@ -189,8 +138,8 @@ function sortIntervals(device: Device): void {
 }
 
 function findIntervalIndexByTime(device: Device, time: number): number {
-  if (time === 1440) {
-    time = 0;
+  if (time === 0) {
+    time = 1440;
   }
 
   const index = device.temperatureConfig.findIndex(

@@ -3,7 +3,6 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import {
   Device,
   addIntervalToDeviceConfig,
-  editIntervalFromDeviceConfig,
   removeIntervalFromDeviceConfig,
 } from '../../shared/device.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -63,7 +62,12 @@ export class DeviceDashboardComponent implements OnInit {
       .subscribe((snapshot) => {
         if (snapshot.payload.exists) {
           const deviceData = snapshot.payload.data() as Device;
-          this.device = { ...deviceData, editMode: false };
+          this.device = {
+            ...deviceData,
+            temperatureConfig:
+              this.device?.temperatureConfig || deviceData.temperatureConfig,
+            editMode: false,
+          };
           this.isLoading = false;
         } else {
           this.router.navigate(['/', 'app']);
