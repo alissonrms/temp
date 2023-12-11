@@ -41,14 +41,31 @@ export class TemperatureIntervalFormComponent {
 
   closeDialog(): void {
     this.dialogState.isOpen = false;
-    this.temperatureIntervalForm.reset();
+    
+    const initialTime = new Date();
+    initialTime.setHours(0, 0, 0);
+    this.temperatureIntervalForm.get('initialTime')?.setValue(initialTime);
+    this.temperatureIntervalForm.get('finalTime')?.setValue(initialTime);
+    this.temperatureIntervalForm.get('temperature')?.setValue(0);
   }
 
   submitForm(): void {
+    let initialTime = convertDateToDailyMinutesTimestamp(
+      this.temperatureIntervalForm.get('initialTime')?.value
+    );
+    initialTime = initialTime === 0 ? 1440 : initialTime;
+
+    let finalTime = convertDateToDailyMinutesTimestamp(
+      this.temperatureIntervalForm.get('finalTime')?.value
+    );
+    finalTime = finalTime === 0 ? 1440 : finalTime;
+
     this.formSubmitted.emit({
-      initialTime: convertDateToDailyMinutesTimestamp(this.temperatureIntervalForm.get('initialTime')?.value),
-      finalTime: convertDateToDailyMinutesTimestamp(this.temperatureIntervalForm.get('finalTime')?.value),
+      initialTime,
+      finalTime,
       temperature: this.temperatureIntervalForm.get('temperature')?.value,
     });
+
+    this.closeDialog();
   }
 }

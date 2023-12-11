@@ -27,10 +27,13 @@ import { SerialInputStepComponent } from './pages/device-register/components/ser
 import { DeviceInfoStepComponent } from './pages/device-register/components/device-info-step/device-info-step.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MenuModule } from 'primeng/menu';
 import { CodeInputModule } from 'angular-code-input';
 import { DateFnsModule } from 'ngx-date-fns';
 import { DeviceNameFormComponent } from './components/device-name-form/device-name-form.component';
 import { DashboardLoadingPageComponent } from './pages/device-dashboard/components/dashboard-loading-page/dashboard-loading-page.component';
+import { TemperatureConfigChartComponent } from './components/temperature-config-chart/temperature-config-chart.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +48,7 @@ import { DashboardLoadingPageComponent } from './pages/device-dashboard/componen
     DeviceInfoStepComponent,
     DeviceNameFormComponent,
     DashboardLoadingPageComponent,
+    TemperatureConfigChartComponent,
   ],
   imports: [
     CommonModule,
@@ -66,6 +70,8 @@ import { DashboardLoadingPageComponent } from './pages/device-dashboard/componen
     FormsModule,
     TooltipModule,
     SkeletonModule,
+    MenuModule,
+    ConfirmDialogModule,
     CodeInputModule.forRoot({
       codeLength: 12,
       isCharsCode: true,

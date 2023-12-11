@@ -40,14 +40,7 @@ export class TemperatureHistoryChartComponent implements OnInit {
           fill: false,
           borderColor: documentStyle.getPropertyValue('--blue-500'),
           tension: 0.4,
-        },
-        {
-          label: 'Temperatura Desejada',
-          data: this.createConfigTemperatureBasedOnHistoryTemperature(),
-          fill: false,
-          borderColor: documentStyle.getPropertyValue('--red-500'),
-          tension: 0,
-        },
+        }
       ],
     };
 
@@ -101,13 +94,17 @@ export class TemperatureHistoryChartComponent implements OnInit {
   }
 
   createTemperatureHistoryData(): Array<{ x: number; y: number }> | undefined {
-    if (this.hideHistoryLine) return [];
-    return this.device?.temperatureHistory.map((temperatureHistoryItem) => {
-      return {
-        x: temperatureHistoryItem.time,
-        y: temperatureHistoryItem.temperature,
-      };
-    });
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+  
+    return this.device?.temperatureHistory
+      .filter((temperatureHistoryItem) => temperatureHistoryItem.time >= twentyFourHoursAgo.getTime())
+      .map((temperatureHistoryItem) => {
+        return {
+          x: temperatureHistoryItem.time,
+          y: temperatureHistoryItem.temperature,
+        };
+      });
   }
 
   createConfigTemperatureBasedOnHistoryTemperature(): Array<{

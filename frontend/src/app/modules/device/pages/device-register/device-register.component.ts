@@ -21,10 +21,6 @@ export class DeviceRegisterComponent {
   device: Device = {
     macAddress: '',
     name: '',
-    actualTemperatureInfos: {
-      temperature: 0,
-      updatedAt: new Date().getTime(),
-    },
     temperatureConfig: [],
     temperatureHistory: [],
   };

@@ -13,7 +13,7 @@
     <span
       class="text-2xl font-semibold mb-2 align-self-center md:align-self-end"
     >
-      {{ device?.actualTemperatureInfos?.temperature }}°C
+      {{ device!.temperatureHistory[device!.temperatureHistory.length - 1].temperature }}°C
     </span>
   </div>
 </div>

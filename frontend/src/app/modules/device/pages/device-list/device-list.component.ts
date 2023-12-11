@@ -83,7 +83,7 @@ export class DeviceListComponent implements OnInit {
           const deviceData = snapshot.payload.data() as Device;
           this.devices[
             this.findDeviceIndexByMacAddress(macAddress)
-          ].actualTemperatureInfos = deviceData.actualTemperatureInfos;
+          ].temperatureHistory = deviceData.temperatureHistory;
         } else {
           console.log('Documento do dispositivo não encontrado.');
         }

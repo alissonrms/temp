@@ -1,17 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Device, addIntervalToDeviceConfig } from '../../shared/device.model';
+import {
+  Device,
+  addIntervalToDeviceConfig,
+  editIntervalFromDeviceConfig,
+  removeIntervalFromDeviceConfig,
+} from '../../shared/device.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UtilsService } from 'src/app/services/utils.service';
 import { dateDisplayOptions } from 'src/app/utils/utils';
+import { ConfirmationService, MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
 
 @Component({
   selector: 'app-device-dashboard',
   templateUrl: './device-dashboard.component.html',
   styleUrls: ['./device-dashboard.component.scss'],
+  providers: [ConfirmationService],
 })
 export class DeviceDashboardComponent implements OnInit {
   device?: Device & { editMode: boolean };
+  @ViewChild(Menu) menu!: Menu;
 
   isLoading = false;
   temperatureModalForm = {
@@ -20,16 +29,29 @@ export class DeviceDashboardComponent implements OnInit {
 
   dateDisplayOptions = dateDisplayOptions;
 
+  menuItems: MenuItem[] = [];
+  currentIntervalIndex = 0;
+
   constructor(
     private firestore: AngularFirestore,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private utilsService: UtilsService
+    private utilsService: UtilsService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
     const deviceMac = this.activatedRoute.snapshot.params['deviceMacAddress'];
     this.fetchAndListenToDeviceChanges(deviceMac);
+    this.menuItems = [
+      {
+        label: 'Remover',
+        icon: 'pi pi-fw pi-trash',
+        command: () => {
+          this.handleDeleteInterval();
+        },
+      },
+    ];
   }
 
   fetchAndListenToDeviceChanges(macAddress: string): void {
@@ -77,11 +99,19 @@ export class DeviceDashboardComponent implements OnInit {
       }
     }
 
-    return this.device?.actualTemperatureInfos.temperature || 0;
+    return 0;
   }
 
   openDialog(): void {
     this.temperatureModalForm.isOpen = true;
+  }
+
+  async saveDeviceTemperatureConfig(): Promise<void> {
+    await this.firestore
+      .collection('devices')
+      .doc(this.device!.macAddress)
+      .update({ temperatureConfig: this.device!.temperatureConfig });
+    return;
   }
 
   handleNewInterval(temperatureIntervalConfig: {
@@ -95,5 +125,51 @@ export class DeviceDashboardComponent implements OnInit {
       temperatureIntervalConfig.finalTime,
       temperatureIntervalConfig.temperature
     );
+
+    this.saveDeviceTemperatureConfig();
+  }
+
+  handleOpenIntervalOptions(event: any): void {
+    this.menu.show(event.originalEvent);
+    this.currentIntervalIndex = event.element.index;
+  }
+
+  handleDeleteInterval(): void {
+    if (this.device!.temperatureConfig.length <= 1) {
+      this.utilsService.showInfoMessage(
+        'Você não pode remover todos os intervalos de configuração'
+      );
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: 'Tem certeza que deseja remover?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Confirmar',
+      rejectLabel: 'Cancelar',
+      accept: () => {
+        removeIntervalFromDeviceConfig(this.device!, this.currentIntervalIndex);
+        this.saveDeviceTemperatureConfig();
+      },
+    });
+  }
+
+  get actualTemperature(): number {
+    if (!this.device) return 0;
+    return this.device.temperatureHistory.length > 0
+      ? this.device.temperatureHistory[
+          this.device.temperatureHistory.length - 1
+        ].temperature
+      : 0;
+  }
+
+  get actualTemperatureTime(): number {
+    if (!this.device) return new Date().getTime();
+    return this.device.temperatureHistory.length > 0
+      ? this.device.temperatureHistory[
+          this.device.temperatureHistory.length - 1
+        ].time
+      : 0;
   }
 }

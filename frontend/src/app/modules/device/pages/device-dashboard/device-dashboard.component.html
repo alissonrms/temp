@@ -25,12 +25,14 @@
       <div class="flex justify-content-between mb-3">
         <div>
           <span class="block text-500 font-medium mb-3">Temperatura Atual</span>
-          <span class="text-900 font-medium text-xl" [pTooltip]="
-          'Atualizado ' +
-          (device?.actualTemperatureInfos?.updatedAt
-            | dfnsFormatDistanceToNow : dateDisplayOptions)
-        ">
-            {{ device?.actualTemperatureInfos?.temperature }}°C
+          <span
+            class="text-900 font-medium text-xl"
+            [pTooltip]="
+              'Atualizado ' +
+              (actualTemperatureTime | dfnsFormatDistanceToNow : dateDisplayOptions)
+            "
+          >
+            {{ actualTemperature }}°C
           </span>
         </div>
         <div
@@ -73,10 +75,12 @@
   <div class="col-12 xl:col-6">
     <div class="card">
       <h5>Programação do Dispositivo</h5>
-      <app-temperature-history-chart
-        [hideHistoryLine]="true"
-        [device]="device"
-      ></app-temperature-history-chart>
+      <app-temperature-config-chart
+        [temperatureConfig]="device?.temperatureConfig || []"
+        (intervalClicked)="handleOpenIntervalOptions($event)"
+      ></app-temperature-config-chart>
+      <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
+      <p-confirmDialog></p-confirmDialog>
       <button
         pButton
         pRipple
@@ -102,7 +106,5 @@
     (formSubmitted)="handleNewInterval($event)"
   ></app-temperature-interval-form>
 </div>
-
-{{ device?.temperatureConfig | json }}
 
 <app-dashboard-loading-page *ngIf="isLoading"></app-dashboard-loading-page>
