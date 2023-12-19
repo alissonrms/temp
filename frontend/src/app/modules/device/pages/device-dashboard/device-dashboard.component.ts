@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UtilsService } from 'src/app/services/utils.service';
 import {
   convertDailyMinutesTimestampToFormattedDate,
+  convertDateToDailyMinutesTimestamp,
   dateDisplayOptions,
 } from 'src/app/utils/utils';
 import { ConfirmationService, MenuItem } from 'primeng/api';
@@ -43,6 +44,7 @@ export class DeviceDashboardComponent implements OnInit {
     private renderer: Renderer2
   ) {
     this.renderer.listen('window', 'click', (e: Event) => {
+      if(!this.menu) return;
       if (!this.menu.containerViewChild.nativeElement.contains(e.target)) {
         this.currentIntervalIndex = -1;
       }
@@ -129,15 +131,16 @@ export class DeviceDashboardComponent implements OnInit {
   get goalTemperature(): number {
     if (!this.device) return 0;
 
-    const currentTimestamp = Date.now();
+    const currentDate = new Date();
     const temperatureConfig = this.device?.temperatureConfig;
+    const dailyTimestamp = convertDateToDailyMinutesTimestamp(currentDate);
     for (const interval of temperatureConfig) {
-      if (currentTimestamp > interval.timeToStop) {
+      if (dailyTimestamp < interval.timeToStop) {
         return interval.temperature;
       }
     }
 
-    return 0;
+    return temperatureConfig[0].temperature;
   }
 
   openDialog(): void {

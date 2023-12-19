@@ -1,5 +1,5 @@
-<div class="grid" *ngIf="!isLoading">
-  <div class="col-12 lg:col-6 xl:col-4">
+<div class="grid justify-content-center" *ngIf="!isLoading">
+  <div class="col-12 lg:col-6 xl:col-6">
     <div class="card mb-0">
       <div class="flex justify-content-between mb-3">
         <div>
@@ -20,7 +20,7 @@
       </div>
     </div>
   </div>
-  <div class="col-12 lg:col-6 xl:col-4">
+  <!-- <div class="col-12 lg:col-6 xl:col-4">
     <div class="card mb-0">
       <div class="flex justify-content-between mb-3">
         <div>
@@ -48,8 +48,8 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-12 lg:col-6 xl:col-4">
+  </div> -->
+  <div class="col-12 lg:col-6 xl:col-6">
     <div class="card mb-0">
       <div class="flex justify-content-between mb-3">
         <div>
@@ -99,14 +99,14 @@
       ></button>
     </div>
   </div>
-  <div class="col-12 xl:col-6">
+  <!-- <div class="col-12 xl:col-6">
     <div class="card">
       <h5>Histórico de Temperatura</h5>
       <app-temperature-history-chart
         [device]="device"
       ></app-temperature-history-chart>
     </div>
-  </div>
+  </div> -->
 
   <app-temperature-interval-form
     [dialogState]="temperatureModalForm"

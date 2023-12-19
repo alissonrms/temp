@@ -63,12 +63,6 @@ export class DeviceListComponent implements OnInit {
   }
 
   registerDevice(device: Device): void {
-    device.temperatureConfig.forEach((config) => {
-      config.timeToStop =
-        this.utilsService.convertTimestampToActualTimestampDate(
-          config.timeToStop
-        );
-    });
     this.devices.push(device);
     this.listenToDeviceChanges(device.macAddress);
   }

@@ -3,15 +3,15 @@
     class="flex flex-wrap gap-2 align-items-center justify-content-between mb-2"
   >
     <div class="flex align-items-center">
-      <i class="pi pi-chart-line mr-2"></i>
-      <span class="font-semibold">Gráfico de Temperatura</span>
+      <i class="pi pi-server mr-2"></i>
+      <span class="font-semibold">Dispositivo</span>
     </div>
   </div>
   <div class="flex flex-column align-items-center gap-4 text-center mb-3">
     <div class="w-full">
-      <app-temperature-history-chart
-        [device]="device"
-      ></app-temperature-history-chart>
+      <app-temperature-config-chart
+        [temperatureConfig]="device?.temperatureConfig || []"
+      ></app-temperature-config-chart>
     </div>
     <app-device-name-form [device]="device" (updateDeviceName)="updateDeviceName.emit($event)"></app-device-name-form>
     <div

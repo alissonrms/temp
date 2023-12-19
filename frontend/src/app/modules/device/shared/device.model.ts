@@ -29,6 +29,11 @@ export function addIntervalToDeviceConfig(
   if (timeToStart === 0) timeToStart = 1440;
   if (timeToStop === 0) timeToStop = 1440;
 
+  if (timeToStart === timeToStop) {
+    device.temperatureConfig = [{ timeToStop: 1440, temperature }];
+    return;
+  }
+
   const timeToStartInterval = findIntervalByTime(device, timeToStart);
   const timeToStopInterval = findIntervalByTime(device, timeToStop);
 
