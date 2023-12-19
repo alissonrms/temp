@@ -14,7 +14,7 @@
       ></app-temperature-config-chart>
     </div>
     <app-device-name-form [device]="device" (updateDeviceName)="updateDeviceName.emit($event)"></app-device-name-form>
-    <div
+    <!-- <div
       class="flex items-center justify-center gap-2 mx-2"
       [pTooltip]="
         'Atualizado ' +
@@ -25,7 +25,7 @@
       <span class="text-xl font-semibold">
         {{ actualTemperature }}°C
       </span>
-    </div>
+    </div> -->
     <a
       [routerLink]="device?.macAddress"
       pButton
